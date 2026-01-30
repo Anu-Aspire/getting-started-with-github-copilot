@@ -45,7 +45,32 @@ document.addEventListener("DOMContentLoaded", () => {
         participantsSection.appendChild(participantsHeading);
 
         if (details.participants && details.participants.length > 0) {
-          const ul = document.createElement("ul");
+          const ul = document.createElement('ul');
+          ul.className = 'participants-list';
+          details.participants.forEach((p) => {
+            const li = document.createElement('li');
+            li.className = 'participant-item';
+
+            const avatar = document.createElement('span');
+            avatar.className = 'participant-avatar';
+            avatar.textContent = getInitials(p);
+
+            const nameNode = document.createTextNode(' ' + p);
+
+            // Create delete icon
+            const deleteIcon = document.createElement('span');
+            deleteIcon.className = 'delete-icon';
+            deleteIcon.textContent = '🗑️'; // You can replace this with an actual icon
+            deleteIcon.style.cursor = 'pointer';
+            deleteIcon.onclick = () => unregisterParticipant(name, p);
+
+            li.appendChild(avatar);
+            li.appendChild(nameNode);
+            li.appendChild(deleteIcon);
+            ul.appendChild(li);
+          });
+          participantsSection.appendChild(ul);
+          const participantsUl = document.createElement("ul");
           ul.className = "participants-list";
           details.participants.forEach((p) => {
             const li = document.createElement("li");
