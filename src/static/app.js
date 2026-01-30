@@ -13,6 +13,15 @@ document.addEventListener("DOMContentLoaded", () => {
       // Clear loading message
       activitiesList.innerHTML = "";
 
+      // helper to compute initials from a participant string (email or name)
+      function getInitials(name) {
+        const base = (name || "").split("@")[0];
+        const parts = base.split(/[^A-Za-z0-9]+/).filter(Boolean);
+        if (parts.length === 0) return (base.charAt(0) || "").toUpperCase();
+        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
         const activityCard = document.createElement("div");
@@ -27,6 +36,65 @@ document.addEventListener("DOMContentLoaded", () => {
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
         `;
 
+        // Participants section (built with DOM methods to avoid injecting raw HTML)
+        const participantsSection = document.createElement("div");
+        participantsSection.className = "participants-section";
+
+        const participantsHeading = document.createElement("h5");
+        participantsHeading.textContent = "Participants";
+        participantsSection.appendChild(participantsHeading);
+
+        if (details.participants && details.participants.length > 0) {
+          const ul = document.createElement('ul');
+          ul.className = 'participants-list';
+          details.participants.forEach((p) => {
+            const li = document.createElement('li');
+            li.className = 'participant-item';
+
+            const avatar = document.createElement('span');
+            avatar.className = 'participant-avatar';
+            avatar.textContent = getInitials(p);
+
+            const nameNode = document.createTextNode(' ' + p);
+
+            // Create delete icon
+            const deleteIcon = document.createElement('span');
+            deleteIcon.className = 'delete-icon';
+            deleteIcon.textContent = '🗑️'; // You can replace this with an actual icon
+            deleteIcon.style.cursor = 'pointer';
+            deleteIcon.onclick = () => unregisterParticipant(name, p);
+
+            li.appendChild(avatar);
+            li.appendChild(nameNode);
+            li.appendChild(deleteIcon);
+            ul.appendChild(li);
+          });
+          participantsSection.appendChild(ul);
+          const participantsUl = document.createElement("ul");
+          ul.className = "participants-list";
+          details.participants.forEach((p) => {
+            const li = document.createElement("li");
+            li.className = "participant-item";
+
+            const avatar = document.createElement("span");
+            avatar.className = "participant-avatar";
+            avatar.textContent = getInitials(p);
+
+            const nameNode = document.createTextNode(" " + p);
+
+            li.appendChild(avatar);
+            li.appendChild(nameNode);
+            ul.appendChild(li);
+          });
+          participantsSection.appendChild(ul);
+        } else {
+          const empty = document.createElement("p");
+          empty.className = "participants-empty";
+          empty.textContent = "No participants yet. Be the first to sign up!";
+          participantsSection.appendChild(empty);
+        }
+
+        activityCard.appendChild(participantsSection);
         activitiesList.appendChild(activityCard);
 
         // Add option to select dropdown
